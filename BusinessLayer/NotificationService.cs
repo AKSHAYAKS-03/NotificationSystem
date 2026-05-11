@@ -102,12 +102,46 @@ namespace BusinessLayer
             return regex.IsMatch(email);
         }
 
+        public static string? GetNameValidationError(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "Invalid name format! Name cannot be empty.";
+
+            string trimmedName = name.Trim();
+            var regex = new Regex(@"^[A-Za-z][A-Za-z\s]{1,49}$", RegexOptions.Compiled);
+            if (!regex.IsMatch(trimmedName))
+                return "Invalid name format! Use letters and spaces only.";
+
+            return null;
+        }
+
+        public static string? GetEmailValidationError(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return "Invalid email format! Email cannot be empty.";
+
+            if (!IsValidEmail(email))
+                return "Invalid email format! Example: name@example.com";
+
+            return null;
+        }
 
         public static bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone)) return false;
             var regex = new Regex(@"^(\+91|0)?[6-9][0-9]{9}$", RegexOptions.Compiled);
             return regex.IsMatch(phone);
+        }
+
+        public static string? GetPhoneValidationError(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return "Invalid phone format! Phone cannot be empty.";
+
+            if (!IsValidPhone(phone))
+                return "Invalid phone format! Use a valid 10-digit number like 9876543210.";
+
+            return null;
         }
 
     }

@@ -9,6 +9,6 @@ namespace Interfaces
         T? Get(Key id);
         List<T>? GetAll();
         T? Update(Key id, T item);
-        T Delete(Key id);
+        T? Delete(Key id);
     }
 }

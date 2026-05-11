@@ -8,7 +8,7 @@ namespace Models
         private string _email = string.Empty;
         private string _phone = string.Empty;
 
-        public string? Id { get; set; }
+        public int Id { get; set; }
 
         public string Name
         {
