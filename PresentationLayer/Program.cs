@@ -10,13 +10,17 @@ namespace PresentationLayer
 {
     class Program
     {
+        // Repository object for user database operations
         static UserRepository userRepository = new UserRepository();
+
+        // Service object for notification handling
         static NotificationService notificationService = new NotificationService();
         
         static void Main(string[] args)
         {
             try
             {
+                // Initialize database and apply migrations
                 DatabaseInitializer.Initialize();
             }
             catch (Exception ex)
@@ -36,6 +40,7 @@ namespace PresentationLayer
 
             while (true)
             {
+                // Main menu
                 Console.WriteLine("-------------------------------------------------------------");
                 Console.WriteLine("\n1. Add User");
                 Console.WriteLine("2. View Users");
@@ -118,6 +123,7 @@ namespace PresentationLayer
             Console.Write("Enter Name: ");
             user.Name = Console.ReadLine() ?? "";
 
+            // Validate user name
             string? nameError = NotificationService.GetNameValidationError(user.Name);
             if (nameError != null)
             {
@@ -130,6 +136,7 @@ namespace PresentationLayer
             Console.Write("Enter Email: ");
             user.Email = Console.ReadLine() ?? "";
 
+            // Validate email format
             string? emailError = NotificationService.GetEmailValidationError(user.Email);
             if (emailError != null)
             {
@@ -139,6 +146,7 @@ namespace PresentationLayer
                 return;
             }
 
+            // Check if email already exists
             if (userRepository.EmailExists(user.Email))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -150,6 +158,7 @@ namespace PresentationLayer
             Console.Write("Enter Phone: ");
             user.Phone = Console.ReadLine() ?? "";
 
+            // Validate phone number
             string? phoneError = NotificationService.GetPhoneValidationError(user.Phone);
             if (phoneError != null)
             {
@@ -162,6 +171,7 @@ namespace PresentationLayer
             try
             {
                 userRepository.Create(user);
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"\nUser added successfully!");
                 Console.ResetColor();
@@ -179,7 +189,7 @@ namespace PresentationLayer
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("\n=========================== View All Users ===========================");
             
-
+            // Fetch all users from database
             var users = userRepository.GetAll();
 
             if (users == null || users.Count == 0)
@@ -191,13 +201,14 @@ namespace PresentationLayer
             }
 
             Console.WriteLine();
+
             foreach (var user in users)
             {
-                Console.WriteLine(user+"\n");
+                Console.WriteLine(user + "\n");
             }
+
             Console.WriteLine("\n=====================================================================");
             Console.ResetColor();
-
         }
 
         static void UpdateUser()
@@ -209,6 +220,7 @@ namespace PresentationLayer
             Console.Write("Enter User ID to update: ");
             string input = Console.ReadLine() ?? "0";
 
+            // Validate user id input
             if (!int.TryParse(input, out int userId) || userId == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -217,6 +229,7 @@ namespace PresentationLayer
                 return;
             }
 
+            // Get existing user details
             User? existingUser = userRepository.Get(userId);
 
             if (existingUser == null)
@@ -231,254 +244,262 @@ namespace PresentationLayer
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
 
-        Console.WriteLine(
-            "\n========== Current Details ==========");
-
-        Console.ResetColor();
-
-        Console.WriteLine(
-            $"Name  : {existingUser.Name}");
-
-        Console.WriteLine(
-            $"Email : {existingUser.Email}");
-
-        Console.WriteLine(
-            $"Phone : {existingUser.Phone}");
-
-        Console.WriteLine(
-            "\nWhat do you want to update?");
-
-        Console.WriteLine("1. Name");
-        Console.WriteLine("2. Email");
-        Console.WriteLine("3. Phone");
-        Console.WriteLine("4. All");
-        Console.WriteLine("5. Back");
-
-        Console.Write("\nEnter Choice: ");
-
-        string choice =
-            Console.ReadLine() ?? "";
-
-        switch (choice)
-        {
-            case "1":
-
-                Console.Write(
-                    "Enter New Name: ");
-
-                string name =
-                    Console.ReadLine() ?? "";
-
-                string? updateNameError = NotificationService.GetNameValidationError(name);
-                if (updateNameError != null)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(updateNameError);
-                    Console.ResetColor();
-                    break;
-                }
-
-                existingUser.Name = name;
-
-                userRepository.Update(
-                    userId,
-                    existingUser);
-
-                Console.ForegroundColor =
-                    ConsoleColor.Green;
-
                 Console.WriteLine(
-                    "Name updated successfully!");
+                    "\n========== Current Details ==========");
 
                 Console.ResetColor();
 
-                break;
-
-            case "2":
-
-                Console.Write(
-                    "Enter New Email: ");
-
-                string email =
-                    Console.ReadLine() ?? "";
-
-                string? updateEmailError = NotificationService.GetEmailValidationError(email);
-                if (updateEmailError != null)
-                {
-                    Console.ForegroundColor =
-                        ConsoleColor.Red;
-
-                    Console.WriteLine(
-                        updateEmailError);
-
-                    Console.ResetColor();
-
-                    break;
-                }
-
-                if (userRepository.EmailExists(email, userId))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Email already exists! Please use a different email.");
-                    Console.ResetColor();
-                    break;
-                }
-
-                existingUser.Email = email;
-
-                userRepository.Update(
-                    userId,
-                    existingUser);
-
-                Console.ForegroundColor =
-                    ConsoleColor.Green;
+                Console.WriteLine(
+                    $"Name  : {existingUser.Name}");
 
                 Console.WriteLine(
-                    "Email updated successfully!");
-
-                Console.ResetColor();
-
-                break;
-
-            case "3":
-
-                Console.Write(
-                    "Enter New Phone: ");
-
-                string phone =
-                    Console.ReadLine() ?? "";
-
-                string? updatePhoneError = NotificationService.GetPhoneValidationError(phone);
-                if (updatePhoneError != null)
-                {
-                    Console.ForegroundColor =
-                        ConsoleColor.Red;
-
-                    Console.WriteLine(
-                        updatePhoneError);
-
-                    Console.ResetColor();
-
-                    break;
-                }
-
-                existingUser.Phone = phone;
-
-                userRepository.Update(
-                    userId,
-                    existingUser);
-
-                Console.ForegroundColor =
-                    ConsoleColor.Green;
+                    $"Email : {existingUser.Email}");
 
                 Console.WriteLine(
-                    "Phone updated successfully!");
-
-                Console.ResetColor();
-
-                break;
-
-            case "4":
-
-                Console.Write(
-                    "Enter New Name: ");
-
-                existingUser.Name =
-                    Console.ReadLine() ?? "";
-
-                string? allNameError = NotificationService.GetNameValidationError(existingUser.Name);
-                if (allNameError != null)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(allNameError);
-                    Console.ResetColor();
-                    break;
-                }
-
-                Console.Write(
-                    "Enter New Email: ");
-
-                string newEmail =
-                    Console.ReadLine() ?? "";
-
-                string? allEmailError = NotificationService.GetEmailValidationError(newEmail);
-                if (allEmailError != null)
-                {
-                    Console.ForegroundColor =
-                        ConsoleColor.Red;
-
-                    Console.WriteLine(
-                        allEmailError);
-
-                    Console.ResetColor();
-
-                    break;
-                }
-
-                if (userRepository.EmailExists(newEmail, userId))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Email already exists! Please use a different email.");
-                    Console.ResetColor();
-                    break;
-                }
-
-                existingUser.Email = newEmail;
-
-                Console.Write(
-                    "Enter New Phone: ");
-
-                string newPhone =
-                    Console.ReadLine() ?? "";
-
-                string? allPhoneError = NotificationService.GetPhoneValidationError(newPhone);
-                if (allPhoneError != null)
-                {
-                    Console.ForegroundColor =
-                        ConsoleColor.Red;
-
-                    Console.WriteLine(
-                        allPhoneError);
-
-                    Console.ResetColor();
-
-                    break;
-                }
-
-                existingUser.Phone = newPhone;
-
-                userRepository.Update(
-                    userId,
-                    existingUser);
-
-                Console.ForegroundColor =
-                    ConsoleColor.Green;
+                    $"Phone : {existingUser.Phone}");
 
                 Console.WriteLine(
-                    "User updated successfully!");
+                    "\nWhat do you want to update?");
 
-                Console.ResetColor();
+                Console.WriteLine("1. Name");
+                Console.WriteLine("2. Email");
+                Console.WriteLine("3. Phone");
+                Console.WriteLine("4. All");
+                Console.WriteLine("5. Back");
 
-                break;
+                Console.Write("\nEnter Choice: ");
 
-            case "5":
+                string choice =
+                    Console.ReadLine() ?? "";
 
-                return;
+                switch (choice)
+                {
+                    case "1":
 
-            default:
+                        Console.Write(
+                            "Enter New Name: ");
 
-                Console.ForegroundColor =
-                    ConsoleColor.Red;
+                        string name =
+                            Console.ReadLine() ?? "";
 
-                Console.WriteLine(
-                    "Invalid Choice!");
+                        string? updateNameError = NotificationService.GetNameValidationError(name);
 
-                Console.ResetColor();
+                        if (updateNameError != null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(updateNameError);
+                            Console.ResetColor();
+                            break;
+                        }
 
-                break;
+                        existingUser.Name = name;
+
+                        userRepository.Update(
+                            userId,
+                            existingUser);
+
+                        Console.ForegroundColor =
+                            ConsoleColor.Green;
+
+                        Console.WriteLine(
+                            "Name updated successfully!");
+
+                        Console.ResetColor();
+
+                        break;
+
+                    case "2":
+
+                        Console.Write(
+                            "Enter New Email: ");
+
+                        string email =
+                            Console.ReadLine() ?? "";
+
+                        string? updateEmailError = NotificationService.GetEmailValidationError(email);
+
+                        if (updateEmailError != null)
+                        {
+                            Console.ForegroundColor =
+                                ConsoleColor.Red;
+
+                            Console.WriteLine(
+                                updateEmailError);
+
+                            Console.ResetColor();
+
+                            break;
+                        }
+
+                        // Prevent duplicate emails
+                        if (userRepository.EmailExists(email, userId))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Email already exists! Please use a different email.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        existingUser.Email = email;
+
+                        userRepository.Update(
+                            userId,
+                            existingUser);
+
+                        Console.ForegroundColor =
+                            ConsoleColor.Green;
+
+                        Console.WriteLine(
+                            "Email updated successfully!");
+
+                        Console.ResetColor();
+
+                        break;
+
+                    case "3":
+
+                        Console.Write(
+                            "Enter New Phone: ");
+
+                        string phone =
+                            Console.ReadLine() ?? "";
+
+                        string? updatePhoneError = NotificationService.GetPhoneValidationError(phone);
+
+                        if (updatePhoneError != null)
+                        {
+                            Console.ForegroundColor =
+                                ConsoleColor.Red;
+
+                            Console.WriteLine(
+                                updatePhoneError);
+
+                            Console.ResetColor();
+
+                            break;
+                        }
+
+                        existingUser.Phone = phone;
+
+                        userRepository.Update(
+                            userId,
+                            existingUser);
+
+                        Console.ForegroundColor =
+                            ConsoleColor.Green;
+
+                        Console.WriteLine(
+                            "Phone updated successfully!");
+
+                        Console.ResetColor();
+
+                        break;
+
+                    case "4":
+
+                        Console.Write(
+                            "Enter New Name: ");
+
+                        existingUser.Name =
+                            Console.ReadLine() ?? "";
+
+                        string? allNameError = NotificationService.GetNameValidationError(existingUser.Name);
+
+                        if (allNameError != null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(allNameError);
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        Console.Write(
+                            "Enter New Email: ");
+
+                        string newEmail =
+                            Console.ReadLine() ?? "";
+
+                        string? allEmailError = NotificationService.GetEmailValidationError(newEmail);
+
+                        if (allEmailError != null)
+                        {
+                            Console.ForegroundColor =
+                                ConsoleColor.Red;
+
+                            Console.WriteLine(
+                                allEmailError);
+
+                            Console.ResetColor();
+
+                            break;
+                        }
+
+                        if (userRepository.EmailExists(newEmail, userId))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Email already exists! Please use a different email.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        existingUser.Email = newEmail;
+
+                        Console.Write(
+                            "Enter New Phone: ");
+
+                        string newPhone =
+                            Console.ReadLine() ?? "";
+
+                        string? allPhoneError = NotificationService.GetPhoneValidationError(newPhone);
+
+                        if (allPhoneError != null)
+                        {
+                            Console.ForegroundColor =
+                                ConsoleColor.Red;
+
+                            Console.WriteLine(
+                                allPhoneError);
+
+                            Console.ResetColor();
+
+                            break;
+                        }
+
+                        existingUser.Phone = newPhone;
+
+                        // Update all details together
+                        userRepository.Update(
+                            userId,
+                            existingUser);
+
+                        Console.ForegroundColor =
+                            ConsoleColor.Green;
+
+                        Console.WriteLine(
+                            "User updated successfully!");
+
+                        Console.ResetColor();
+
+                        break;
+
+                    case "5":
+
+                        return;
+
+                    default:
+
+                        Console.ForegroundColor =
+                            ConsoleColor.Red;
+
+                        Console.WriteLine(
+                            "Invalid Choice!");
+
+                        Console.ResetColor();
+
+                        break;
+                }
+            }
         }
-    }
-}
 
         static void DeleteUser()
         {
@@ -489,6 +510,7 @@ namespace PresentationLayer
             Console.Write("Enter User ID to delete: ");
             string input = Console.ReadLine() ?? "0";
 
+            // Check valid user id
             if (!int.TryParse(input, out int userId) || userId == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -498,6 +520,7 @@ namespace PresentationLayer
             }
 
             User? user = userRepository.Get(userId);
+
             if (user == null)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -507,14 +530,18 @@ namespace PresentationLayer
             }
 
             Console.WriteLine($"\nUser to delete: {user.Name}");
+
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("Are you sure? (yes/no): ");
             Console.ResetColor();
+
             string confirm = Console.ReadLine() ?? "";
 
+            // Confirm before deleting user
             if (confirm.ToLower() == "yes")
             {
                 userRepository.Delete(userId);
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("\nUser deleted successfully!");
                 Console.ResetColor();
@@ -546,7 +573,9 @@ namespace PresentationLayer
                     return;
                 }
 
+                // Fetch user before sending notification
                 User? user = userRepository.Get(userId);
+
                 if (user == null)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -560,6 +589,7 @@ namespace PresentationLayer
                 Console.Write("Enter Message: ");
                 string message = Console.ReadLine() ?? "";
 
+                // Message should not be empty
                 if (string.IsNullOrWhiteSpace(message))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -571,11 +601,14 @@ namespace PresentationLayer
                 Console.WriteLine("\nChoose Notification Type:");
                 Console.WriteLine("1. Email");
                 Console.WriteLine("2. SMS");
+
                 Console.Write("Enter your choice (1 or 2): ");
+
                 string notifChoice = Console.ReadLine() ?? "0";
 
                 INotificationSender? notificationSender = null;
 
+                // Select notification sender type
                 if (notifChoice == "1")
                 {
                     notificationSender = new EmailNotification();
