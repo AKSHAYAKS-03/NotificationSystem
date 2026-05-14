@@ -35,18 +35,26 @@ namespace DataAccessLayer
         {
             modelBuilder.Entity<User>(user =>
             {
+                // Map to the main PostgreSQL table name with exact casing
                 user.ToTable("Users");
 
                 user.HasKey(u => u.Id)
                     .HasName("users_pkey");
 
+                // Use exact database column names for the quoted table
+                user.Property(u => u.Id)
+                    .HasColumnName("Id");
+
                 user.Property(u => u.Name)
+                    .HasColumnName("Name")
                     .HasMaxLength(100);
 
                 user.Property(u => u.Email)
+                    .HasColumnName("Email")
                     .HasMaxLength(150);
 
                 user.Property(u => u.Phone)
+                    .HasColumnName("Phone")
                     .HasMaxLength(20);
 
                 user.HasIndex(u => u.Email)
@@ -56,15 +64,28 @@ namespace DataAccessLayer
 
             modelBuilder.Entity<Notification>(notification =>
             {
+                // Map to the main PostgreSQL table name with exact casing
                 notification.ToTable("Notifications");
 
                 notification.HasKey(n => n.NotificationId)
                     .HasName("notifications_pkey");
 
+                // Use exact database column names for the quoted table
+                notification.Property(n => n.NotificationId)
+                    .HasColumnName("NotificationId");
+
+                notification.Property(n => n.UserId)
+                    .HasColumnName("UserId");
+
+                notification.Property(n => n.Message)
+                    .HasColumnName("Message");
+
                 notification.Property(n => n.Type)
-                    .HasMaxLength(50);
+                    .HasMaxLength(50)
+                    .HasColumnName("Type");
 
                 notification.Property(n => n.SentDate)
+                    .HasColumnName("SentDate")
                     .HasColumnType("timestamp without time zone");
 
                 notification.HasIndex(n => n.UserId)

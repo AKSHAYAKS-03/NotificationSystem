@@ -1,21 +1,28 @@
 using System;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer
 {
     public static class DatabaseInitializer
     {
-
-        // Apply migrations and initialize the database , on application startup (called from Program.cs)
+        // Verifies the database connection on application startup (called from Program.cs).
+        // Tables already exist in PostgreSQL — no migration needed.
         public static void Initialize()
         {
             try
             {
                 using var dbContext = new NotificationDbContext();
 
-                Console.WriteLine("Applying EF Core migrations...");
-                dbContext.Database.Migrate();
-                Console.WriteLine("Database initialization completed successfully.");
+                // Just check that we can reach the database
+                bool canConnect = dbContext.Database.CanConnect();
+
+                if (canConnect)
+                {
+                    Console.WriteLine("Database connection established successfully.");
+                }
+                else
+                {
+                    throw new Exception("Cannot connect to the database. Please check the connection string.");
+                }
             }
             catch (Exception ex)
             {
@@ -25,3 +32,4 @@ namespace DataAccessLayer
         }
     }
 }
+
